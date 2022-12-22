@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Searching document</title>
+</head>
+<body>
+Searching document:
+<br>
+<form action="/documents/find" method="get">
+    <label>
+        <input type="text" name="text" size="50">
+        Number of page
+        <input type="number" name="page">
+        Size of page
+        <input type="number" name="size">
+        Order of page
+        <select name="orderBy">
+            <option value="id">ID</option>
+            <option value="Text">Text</option>
+            <option value="dateReg">Date of registration</option>
+        </select>
+
+    </label>
+    <p></p>
+    <div>
+        <input type="submit" value="Search">
+    </div>
+</form>
+<div th:each="text:${texts}">
+    <p>Document's ID: <span th:text="${text.id}"></span></p>
+    <p>Document's text: <span th:text="${text.text}"></span></p>
+    <p>Document's regDate: <span th:text="${text.dateReg}"></span></p>
+    <br>
+</div>
+</body>
+</html>

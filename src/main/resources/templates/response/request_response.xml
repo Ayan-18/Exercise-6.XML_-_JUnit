@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<requests>
+    <#list requests as request>
+         <request>
+            <id>${request.id}</id>
+            <text>${request.text}</text>
+            <dateReg>${request.dateReg}</dateReg>
+        </request>
+    </#list>
+</requests>
