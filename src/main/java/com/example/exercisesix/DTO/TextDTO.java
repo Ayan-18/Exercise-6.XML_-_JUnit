@@ -40,4 +40,13 @@ public class TextDTO {
     public void setDateReg(LocalDateTime dateReg) {
         this.dateReg = dateReg;
     }
+
+    @Override
+    public String toString() {
+        return "TextDTO{" +
+                "id='" + id + '\'' +
+                ", text='" + text + '\'' +
+                ", dateReg=" + dateReg +
+                '}';
+    }
 }

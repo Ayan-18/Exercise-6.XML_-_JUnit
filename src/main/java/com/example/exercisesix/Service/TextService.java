@@ -2,20 +2,15 @@ package com.example.exercisesix.Service;
 
 import com.example.exercisesix.DTO.TextDTO;
 import com.example.exercisesix.Document.Text;
+import com.example.exercisesix.Mapper.ModelMaper;
 import com.example.exercisesix.Repository.TextRepository;
 import com.example.exercisesix.xml.Request;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
+import com.example.exercisesix.xml.Requests;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,20 +21,17 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-import java.io.*;
-import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class TextService {
-    private final Configuration freemarker;
     private final TextRepository textRepository;
-    @Autowired
-    private ModelMapper modelMapper;
-
+    private final ModelMaper modelMapper;
 
     public void create(final Text text) {
         textRepository.save(text);
@@ -58,20 +50,10 @@ public class TextService {
     }
 
     public List<TextDTO> allDTO(Pageable pageable) {
-        return textRepository.findAll()
-                .stream()
-                .map(this::convertEntityToDto)
-                .collect(Collectors.toList());
+        return modelMapper.mapAll(textRepository.findAll(pageable),TextDTO.class);
     }
 
-    private TextDTO convertEntityToDto(Text text) {
-        modelMapper.getConfiguration()
-                .setMatchingStrategy(MatchingStrategies.LOOSE);
-        return modelMapper.map(text, TextDTO.class);
-    }
-
-
-    public String search(String string, Pageable pageable) throws IOException, TemplateException {
+    public String search(String string, Pageable pageable) throws JAXBException {
         if (validateXMLSchema(string)) {
             Request request = new Request();
             try {
@@ -82,33 +64,26 @@ public class TextService {
                 e.printStackTrace();
             }
 
-//            JAXBContext jaxbContext = JAXBContext.newInstance(Request.class);
-//            Marshaller marshaller = jaxbContext.createMarshaller();
+            Page<Text> texts = textRepository.findAllByTextContainingIgnoreCase(request.getText(), pageable);
+            List<TextDTO> dtoList = modelMapper.mapAll(texts, TextDTO.class);
 
-
-            List<TextDTO> dtoList = textRepository.findAllByTextContainingIgnoreCase(request.getText(), pageable)
-                    .stream()
-                    .map(this::convertEntityToDto).toList();
-
-            List<Request> requestList = new ArrayList<>();
-
+            Requests requests = new Requests();
             for (TextDTO dto : dtoList) {
-                Request r = new Request() {
-                };
+                Request r = new Request();
                 r.setId(dto.getId());
                 r.setText(dto.getText());
                 r.setDateReg(dto.getDateReg().toString());
-                requestList.add(r);
+                requests.add(r);
             }
-            Template template = freemarker.getTemplate("response/request_response.xml");
-            Writer writer = new StringWriter();
-            template.process(Map.of("requests", requestList), writer);
-            return writer.toString();
+            JAXBContext jaxbContext = JAXBContext.newInstance(Requests.class);
+            Marshaller marshaller = jaxbContext.createMarshaller();
 
+            StringWriter sw = new StringWriter();
 
-//            OutputStream os = new FileOutputStream("src/main/resources/templates/response/requests.xml");
-//            marshaller.setProperty("jaxb.formatted.output", Boolean.TRUE);
-//            marshaller.marshal(requestList, os);
+            marshaller.setProperty("jaxb.formatted.output", Boolean.TRUE);
+            marshaller.marshal(requests, sw);
+
+            return sw.toString();
         } else {
             System.out.println("Валидация не прошла успешно");
         }

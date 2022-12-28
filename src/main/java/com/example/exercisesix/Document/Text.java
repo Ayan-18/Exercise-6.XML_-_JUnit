@@ -59,6 +59,7 @@ public class Text {
         return "Text{" +
                 "id='" + id + '\'' +
                 ", text='" + text + '\'' +
+                ", dateReg=" + dateReg +
                 '}';
     }
 }

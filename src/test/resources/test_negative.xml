@@ -1,6 +1,18 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<request xmlns="$LOCAL_SCHEMA$">
-    <id></id>
-    <text></text>
-    <dateReg></dateReg>
-</request>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<requests>
+    <request>
+        <id>1</id>
+        <text>Toleu 1</text>
+        <dateReg>2022-12-20T02:44:31</dateReg>
+    </request>
+    <request>
+        <id>2</id>
+        <text>Ayan 2</text>
+        <dateReg>2022-12-20T02:44:32</dateReg>
+    </request>
+    <request>
+        <id>3</id>
+        <text>Toleu Ayan 3</text>
+        <dateReg>2022-12-20T02:44:33</dateReg>
+    </request>
+</requests>

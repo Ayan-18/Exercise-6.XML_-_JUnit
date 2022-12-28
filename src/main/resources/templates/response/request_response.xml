@@ -1,10 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <requests>
-    <#list requests as request>
-         <request>
-            <id>${request.id}</id>
-            <text>${request.text}</text>
-            <dateReg>${request.dateReg}</dateReg>
-        </request>
-    </#list>
+    <request>
+        <id>1</id>
+        <text>Toleu 1</text>
+        <dateReg>2022-12-20T02:44:31</dateReg>
+    </request>
+    <request>
+        <id>2</id>
+        <text>Ayan 2</text>
+        <dateReg>2022-12-20T02:44:32</dateReg>
+    </request>
+    <request>
+        <id>3</id>
+        <text>Toleu Ayan 3</text>
+        <dateReg>2022-12-20T02:44:33</dateReg>
+    </request>
+    <request>
+        <id>4</id>
+        <text>TA 4</text>
+        <dateReg>2022-12-20T02:44:34</dateReg>
+    </request>
 </requests>

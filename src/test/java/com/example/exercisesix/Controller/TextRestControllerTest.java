@@ -1,56 +1,75 @@
 package com.example.exercisesix.Controller;
 
-import com.example.exercisesix.DTO.TextDTO;
 import com.example.exercisesix.Document.Text;
+import com.example.exercisesix.ExerciseSixApplication;
 import com.example.exercisesix.Repository.TextRepository;
-import com.example.exercisesix.Service.TextService;
-import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.convention.MatchingStrategies;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-class TextRestControllerTest {
-//    @Autowired
-//    private ModelMapper modelMapper;
-//    @Autowired
-//    private MockMvc mockMvc;
-//    @MockBean
-//    private TextRepository repo;
+@RunWith(SpringRunner.class)
+@AutoConfigureMockMvc
+@SpringBootTest(classes = ExerciseSixApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class TextRestControllerTest {
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private TextRestController restController;
+    @Autowired
+    private ObjectMapper objectMapper;
+    @Autowired
+    private TextRepository textRepository;
+
 
     @Test
-    void all() throws Exception {
-
+    public void all() throws Exception {
+        this.mockMvc.perform(
+                        get("/documents/all")
+                                .param("page", "1")
+                                .param("size", "2")
+                                .param("sortBy", "dateReg"))
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 
     @Test
-    void delete() {
+    public void delete() throws Exception {
+        Text text = createTextTest();
+
+        this.mockMvc.perform(
+                        get("/documents/{id}", text.getId()))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void search() {
+    public void search() throws Exception {
+        String string = """
+                <request>
+                <id>122</id>
+                <text>Aidana</text>
+                <dateReg>2022-12-20T02:43:28</dateReg>
+                </request>
+                """;
+        this.mockMvc.perform(
+                        post("/documents/search").content(string).contentType("application/xml"))
+                .andDo(print()).andExpect(status().isOk());
     }
 
-//    private TextDTO convertEntityToDto(Text text) {
-//        modelMapper.getConfiguration()
-//                .setMatchingStrategy(MatchingStrategies.LOOSE);
-//        return modelMapper.map(text, TextDTO.class);
-//    }
+    private Text createTextTest() {
+        Text textTest = new Text("1", "Ayan Toleu java", LocalDateTime.of(2022, 12, 19, 2, 44, 31));
+        return textRepository.save(textTest);
+    }
 }
